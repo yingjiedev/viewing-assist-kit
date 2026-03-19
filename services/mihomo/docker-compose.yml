@@ -10,14 +10,16 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - family-network
+      family-network:
+        ipv4_address: ${METACUBEXD_IP}
 
   mihomo:
     container_name: mihomo
     image: metacubex/mihomo:Alpha
     restart: always
     networks:
-      - family-network
+      family-network:
+        ipv4_address: ${MIHOMO_IP}
     ports:
       - "7890:7890"
       - "7891:7891"

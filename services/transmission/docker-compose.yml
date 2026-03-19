@@ -17,7 +17,8 @@ services:
       - /path/to/downloads:/downloads
       - ./watch:/watch
     networks:
-      - family-network
+      family-network:
+        ipv4_address: ${TRANSMISSION_IP}
 
 networks:
   family-network:

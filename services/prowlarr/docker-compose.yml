@@ -11,7 +11,8 @@ services:
     volumes:
       - ./config:/config
     networks:
-      - family-network
+      family-network:
+        ipv4_address: ${PROWLARR_IP}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9696"]
       interval: 30s

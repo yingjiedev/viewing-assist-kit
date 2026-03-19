@@ -15,7 +15,8 @@ services:
       - /path/to/movies:/movies
       - /path/to/downloads:/downloads
     networks:
-      - family-network
+      family-network:
+        ipv4_address: ${RADARR_IP}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7878"]
       interval: 30s

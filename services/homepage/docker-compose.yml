@@ -6,14 +6,15 @@ services:
 
     environment:
       - TZ=${TZ:-Asia/Shanghai}
-      - HOMEPAGE_ALLOWED_HOSTS=${HOST_IP}:3000,homepage.lan.xyz
+      - HOMEPAGE_ALLOWED_HOSTS=${HOST_IP}:3000,homepage.${DOMAIN}
     volumes:
       - ./data:/app/data
       - ./config:/app/config
       - /sys:/sys:ro
       - ./public/images:/app/public/images
     networks:
-      - family-network
+      family-network:
+        ipv4_address: ${HOMEPAGE_IP}
 
 networks:
   family-network:

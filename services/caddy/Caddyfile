@@ -1,6 +1,6 @@
 {
 	auto_https disable_redirects
-	default_sni lb.lan.xyz
+	default_sni lb.{$DOMAIN}
 }
 
 # HTTP → HTTPS 跳转
@@ -9,62 +9,62 @@ http:// {
 }
 
 # 默认内部站点（用于 SNI-less 客户端）
-https://lb.lan.xyz {
+https://lb.{$DOMAIN} {
 	tls internal
-	reverse_proxy {$HOST_IP:18789}
+	reverse_proxy {$HOST_IP}:{$OPENCLAW_PORT}
 }
 
 # OpenClaw Dashboard
-https://openclaw.lan.xyz,
+https://openclaw.{$DOMAIN},
 https://{$HOST_IP} {
 	tls internal
-	reverse_proxy {$HOST_IP:18789}
+	reverse_proxy {$HOST_IP}:{$OPENCLAW_PORT}
 }
 
 # Jellyfin
-https://jellyfin.lan.xyz {
+https://jellyfin.{$DOMAIN} {
 	tls internal
 	reverse_proxy jellyfin:8096
 }
 
 # Sonarr
-https://sonarr.lan.xyz {
+https://sonarr.{$DOMAIN} {
 	tls internal
 	reverse_proxy sonarr:8989
 }
 
 # Radarr
-https://radarr.lan.xyz {
+https://radarr.{$DOMAIN} {
 	tls internal
 	reverse_proxy radarr:7878
 }
 
 # Prowlarr
-https://prowlarr.lan.xyz {
+https://prowlarr.{$DOMAIN} {
 	tls internal
 	reverse_proxy prowlarr:9696
 }
 
 # Transmission
-https://transmission.lan.xyz {
+https://transmission.{$DOMAIN} {
 	tls internal
 	reverse_proxy transmission:9091
 }
 
 # Jellyseerr
-https://jellyseerr.lan.xyz {
+https://jellyseerr.{$DOMAIN} {
 	tls internal
 	reverse_proxy jellyseerr:5055
 }
 
 # Homepage
-https://homepage.lan.xyz {
+https://homepage.{$DOMAIN} {
 	tls internal
 	reverse_proxy homepage:3000
 }
 
 # MetaCubeXD (Mihomo Dashboard)
-https://clash.lan.xyz {
+https://clash.{$DOMAIN} {
 	tls internal
 	reverse_proxy metacubexd:80
 }

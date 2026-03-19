@@ -18,7 +18,8 @@ services:
     devices:
       - /dev/dri:/dev/dri
     networks:
-      - family-network
+      family-network:
+        ipv4_address: ${SONARR_IP}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8989"]
       interval: 30s

@@ -1,0 +1,33 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
+      - PUID=0
+      - PGID=0
+      - JELLYFIN_PublishedServerUrl=http://${HOST_IP}
+      - JELLYFIN_StrictSSL=false
+      - JELLYFIN_EnableApiAccess=true
+      - JELLYFIN_EnableWebSocket=true
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - /path/to/media:/media
+      - ./fonts:/usr/share/fonts/truetype
+    devices:
+      - /dev/dri:/dev/dri
+    networks:
+      - family-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8096"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  family-network:
+    external: true

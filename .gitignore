@@ -205,3 +205,31 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# =====================================
+# Viewing Assist Kit - Docker & Config
+# =====================================
+
+# Environment files with secrets
+.env.local
+*.env.local
+
+# Config files with sensitive data
+services/mihomo/config/*.yaml
+services/transmission/config/
+services/jellyfin/config/
+services/radarr/config/
+services/sonarr/config/
+services/prowlarr/config/
+services/jellyseerr/config/
+services/homepage/data/
+services/homepage/config/
+
+# Data directories
+data/
+cache/
+downloads/
+
+# Caddy data
+services/caddy/data/
+services/caddy/config/

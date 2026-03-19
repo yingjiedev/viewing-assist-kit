@@ -1,0 +1,28 @@
+services:
+  radarr:
+    image: ghcr.nju.edu.cn/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
+      - PUID=0
+      - PGID=0
+      - RADARR_EnableWebSocket=true
+      - RADARR_EnableApiAccess=true
+    volumes:
+      - ./config:/config
+      - /path/to/movies:/movies
+      - /path/to/downloads:/downloads
+    networks:
+      - family-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7878"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  family-network:
+    external: true

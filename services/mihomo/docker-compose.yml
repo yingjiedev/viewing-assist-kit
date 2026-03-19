@@ -1,0 +1,30 @@
+services:
+  metacubexd:
+    container_name: metacubexd
+    image: ghcr.nju.edu.cn/metacubex/metacubexd
+    restart: always
+    environment:
+      - DEFAULT_BACKEND_URL=http://${HOST_IP}:9090
+    volumes:
+      - ./config:/root/.config/mihomo
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - family-network
+
+  mihomo:
+    container_name: mihomo
+    image: metacubex/mihomo:Alpha
+    restart: always
+    networks:
+      - family-network
+    ports:
+      - "7890:7890"
+      - "7891:7891"
+      - "9090:9090"
+    volumes:
+      - ./config:/root/.config/mihomo/
+
+networks:
+  family-network:
+    external: true

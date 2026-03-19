@@ -1,0 +1,24 @@
+services:
+  transmission:
+    image: ghcr.nju.edu.cn/linuxserver/transmission:latest
+    container_name: transmission
+    restart: unless-stopped
+    ports:
+      - "51413:51413"
+      - "51413:51413/udp"
+    environment:
+      - TZ=${TZ:-Etc/UTC}
+      - PUID=0
+      - PGID=0
+      - USERNAME=${TRANSMISSION_USERNAME:-admin}
+      - PASSWORD=${TRANSMISSION_PASSWORD:-password}
+    volumes:
+      - ./config:/config
+      - /path/to/downloads:/downloads
+      - ./watch:/watch
+    networks:
+      - family-network
+
+networks:
+  family-network:
+    external: true

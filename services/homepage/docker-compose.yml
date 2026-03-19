@@ -1,0 +1,20 @@
+services:
+  homepage:
+    image: ghcr.nju.edu.cn/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
+      - HOMEPAGE_ALLOWED_HOSTS=${HOST_IP}:3000,homepage.lan.xyz
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+      - /sys:/sys:ro
+      - ./public/images:/app/public/images
+    networks:
+      - family-network
+
+networks:
+  family-network:
+    external: true

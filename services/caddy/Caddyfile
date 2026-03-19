@@ -1,0 +1,70 @@
+{
+	auto_https disable_redirects
+	default_sni lb.lan.xyz
+}
+
+# HTTP → HTTPS 跳转
+http:// {
+	redir https://{host}{uri} permanent
+}
+
+# 默认内部站点（用于 SNI-less 客户端）
+https://lb.lan.xyz {
+	tls internal
+	reverse_proxy {$HOST_IP:18789}
+}
+
+# OpenClaw Dashboard
+https://openclaw.lan.xyz,
+https://{$HOST_IP} {
+	tls internal
+	reverse_proxy {$HOST_IP:18789}
+}
+
+# Jellyfin
+https://jellyfin.lan.xyz {
+	tls internal
+	reverse_proxy jellyfin:8096
+}
+
+# Sonarr
+https://sonarr.lan.xyz {
+	tls internal
+	reverse_proxy sonarr:8989
+}
+
+# Radarr
+https://radarr.lan.xyz {
+	tls internal
+	reverse_proxy radarr:7878
+}
+
+# Prowlarr
+https://prowlarr.lan.xyz {
+	tls internal
+	reverse_proxy prowlarr:9696
+}
+
+# Transmission
+https://transmission.lan.xyz {
+	tls internal
+	reverse_proxy transmission:9091
+}
+
+# Jellyseerr
+https://jellyseerr.lan.xyz {
+	tls internal
+	reverse_proxy jellyseerr:5055
+}
+
+# Homepage
+https://homepage.lan.xyz {
+	tls internal
+	reverse_proxy homepage:3000
+}
+
+# MetaCubeXD (Mihomo Dashboard)
+https://clash.lan.xyz {
+	tls internal
+	reverse_proxy metacubexd:80
+}

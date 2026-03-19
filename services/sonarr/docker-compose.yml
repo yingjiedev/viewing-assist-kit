@@ -1,0 +1,31 @@
+services:
+  sonarr:
+    image: ghcr.nju.edu.cn/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+
+    environment:
+      - TZ=${TZ:-Asia/Shanghai}
+      - PUID=0
+      - PGID=0
+      - SONARR_EnableWebSocket=true
+      - SONARR_EnableApiAccess=true
+    volumes:
+      - ./config:/config
+      - /path/to/tv:/tv
+      - /path/to/downloads:/downloads
+      - ./transcodes:/transcodes
+    devices:
+      - /dev/dri:/dev/dri
+    networks:
+      - family-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8989"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  family-network:
+    external: true

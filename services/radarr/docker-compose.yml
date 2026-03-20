@@ -18,7 +18,7 @@ services:
       family-network:
         ipv4_address: ${RADARR_IP}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7878"]
+      test: ["CMD-SHELL", "curl -f http://localhost:7878/ping || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

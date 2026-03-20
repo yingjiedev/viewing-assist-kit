@@ -21,7 +21,7 @@ services:
       family-network:
         ipv4_address: ${SONARR_IP}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8989"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8989/ping || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -8,20 +8,20 @@
 
 ## 服务列表
 
-| 服务 | 域名 | 容器 IP | 端口 | 功能 |
-|------|------|---------|------|------|
-| Caddy | *.${DOMAIN} | ${CADDY_IP} | 80, 443 | 反向代理，HTTPS 自签名证书 |
-| Homepage | homepage.${DOMAIN} | ${HOMEPAGE_IP} | 3000 | 服务仪表盘 |
-| Jellyfin | jellyfin.${DOMAIN} | ${JELLYFIN_IP} | 8096 | 媒体服务器 |
-| Radarr | radarr.${DOMAIN} | ${RADARR_IP} | 7878 | 电影管理 |
-| Sonarr | sonarr.${DOMAIN} | ${SONARR_IP} | 8989 | 电视剧管理 |
-| Prowlarr | prowlarr.${DOMAIN} | ${PROWLARR_IP} | 9696 | 索引器管理 |
-| Transmission | transmission.${DOMAIN} | ${TRANSMISSION_IP} | 9091 | BT 下载 |
-| Jellyseerr | jellyseerr.${DOMAIN} | ${JELLYSEERR_IP} | 5055 | 媒体请求管理 |
+| 服务 | 域名 | 端口 | 功能 |
+|------|------|------|------|
+| Caddy | *.${DOMAIN} | 80, 443 | 反向代理，HTTPS 自签名证书 |
+| Homepage | homepage.${DOMAIN} | 3000 | 服务仪表盘 |
+| Jellyfin | jellyfin.${DOMAIN} | 8096 | 媒体服务器 |
+| Radarr | radarr.${DOMAIN} | 7878 | 电影管理 |
+| Sonarr | sonarr.${DOMAIN} | 8989 | 电视剧管理 |
+| Prowlarr | prowlarr.${DOMAIN} | 9696 | 索引器管理 |
+| Transmission | transmission.${DOMAIN} | 9091 | BT 下载 |
+| Jellyseerr | jellyseerr.${DOMAIN} | 5055 | 媒体请求管理 |
 
 ## 网络架构
 
-所有服务使用 `family-network` bridge 网络，通过 Caddy 反向代理统一对外提供服务。
+所有服务使用 `family-network` bridge 网络，通过 Docker 内置 DNS 实现服务间通信（直接使用容器名称），Caddy 反向代理统一对外提供服务。
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -30,7 +30,6 @@
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐ │
 │  │                 family-network (bridge)                    │ │
-│  │                    ${NETWORK_SUBNET}                       │ │
 │  │                                                           │ │
 │  │   ┌─────────────────────────────────────────────────────┐ │ │
 │  │   │              Caddy (反向代理)                        │ │ │
@@ -77,7 +76,7 @@
 
 ```bash
 # 1. 创建网络
-docker network create --subnet=${NETWORK_SUBNET} family-network
+docker network create family-network
 
 # 2. 配置环境变量
 cp .env.example .env
@@ -93,7 +92,6 @@ cp .env.example .env
 |------|------|--------|
 | `-q, --quick <ip>` | 快速部署 | - |
 | `-d, --data <path>` | 数据根目录 | `/srv/media` |
-| `-n, --network <subnet>` | Docker 子网 | `172.30.0.0/16` |
 | `-D, --domain <domain>` | 域名后缀 | `home.local` |
 | `-u, --user <uid>:<gid>` | 运行用户 | `1000:1000` |
 | `--dry-run` | 仅生成配置 | - |

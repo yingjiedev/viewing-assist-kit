@@ -17,8 +17,7 @@ services:
       - ${DATA_DIR:-/srv/media}/downloads:/downloads
       - ${DATA_DIR:-/srv/media}/watch:/watch
     networks:
-      family-network:
-        ipv4_address: ${TRANSMISSION_IP}
+      - family-network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:9091 || exit 1"]
       interval: 30s

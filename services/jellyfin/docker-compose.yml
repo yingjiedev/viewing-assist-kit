@@ -20,8 +20,7 @@ services:
     devices:
       - /dev/dri:/dev/dri
     networks:
-      family-network:
-        ipv4_address: ${JELLYFIN_IP}
+      - family-network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8096/health || exit 1"]
       interval: 30s

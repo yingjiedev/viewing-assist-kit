@@ -15,7 +15,6 @@ source "$DEPLOY_SCRIPT_DIR/lib/service.sh"
 # 默认值
 DEFAULT_HOST_IP=""
 DEFAULT_DATA_DIR="/srv/media"
-DEFAULT_NETWORK_SUBNET="172.30.0.0/16"
 DEFAULT_DOMAIN="home.local"
 DEFAULT_PUID=1000
 DEFAULT_PGID=1000
@@ -36,7 +35,6 @@ Viewing Assist Kit 一键部署脚本
   -q, --quick <ip>         快速部署（仅需宿主机IP）
   -c, --config <file>      使用指定配置文件
   -d, --data <path>        数据根目录（默认: /srv/media）
-  -n, --network <subnet>   Docker 子网（默认: 172.30.0.0/16）
   -D, --domain <domain>    域名后缀（默认: home.local）
   -u, --user <uid>:<gid>   运行用户（默认: 1000:1000）
   --dry-run                仅生成配置，不启动服务
@@ -73,10 +71,6 @@ interactive_config() {
     # 域名后缀
     read -p "域名后缀 [${DEFAULT_DOMAIN}]: " DOMAIN
     DOMAIN="${DOMAIN:-$DEFAULT_DOMAIN}"
-
-    # 网络子网
-    read -p "Docker 子网 [${DEFAULT_NETWORK_SUBNET}]: " NETWORK_SUBNET
-    NETWORK_SUBNET="${NETWORK_SUBNET:-$DEFAULT_NETWORK_SUBNET}"
 
     # 用户 ID
     read -p "运行用户 UID [${DEFAULT_PUID}]: " PUID
@@ -141,7 +135,6 @@ quick_config() {
     HOST_IP="$ip"
     DATA_DIR="$DEFAULT_DATA_DIR"
     DOMAIN="$DEFAULT_DOMAIN"
-    NETWORK_SUBNET="$DEFAULT_NETWORK_SUBNET"
     PUID="$DEFAULT_PUID"
     PGID="$DEFAULT_PGID"
     TZ="$DEFAULT_TZ"
@@ -174,10 +167,6 @@ parse_args() {
                 ;;
             -d|--data)
                 DATA_DIR="$2"
-                shift 2
-                ;;
-            -n|--network)
-                NETWORK_SUBNET="$2"
                 shift 2
                 ;;
             -D|--domain)
@@ -246,7 +235,6 @@ main() {
     # 设置默认值
     DATA_DIR="${DATA_DIR:-$DEFAULT_DATA_DIR}"
     DOMAIN="${DOMAIN:-$DEFAULT_DOMAIN}"
-    NETWORK_SUBNET="${NETWORK_SUBNET:-$DEFAULT_NETWORK_SUBNET}"
     PUID="${PUID:-$DEFAULT_PUID}"
     PGID="${PGID:-$DEFAULT_PGID}"
     TZ="${TZ:-$DEFAULT_TZ}"
@@ -259,7 +247,7 @@ main() {
 
     # 生成配置
     echo "=== 生成配置 ==="
-    generate_env "$HOST_IP" "$DOMAIN" "$NETWORK_SUBNET" "$DATA_DIR" "$PUID" "$PGID" "$TZ" "$TRANSMISSION_PASSWORD"
+    generate_env "$HOST_IP" "$DOMAIN" "$DATA_DIR" "$PUID" "$PGID" "$TZ" "$TRANSMISSION_PASSWORD"
     validate_config
     echo ""
 
@@ -280,7 +268,7 @@ main() {
 
     # 创建网络
     echo "=== 配置网络 ==="
-    create_network "$NETWORK_SUBNET"
+    create_network
     echo ""
 
     # 启动服务

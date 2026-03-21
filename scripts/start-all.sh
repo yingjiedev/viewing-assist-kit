@@ -33,8 +33,8 @@ echo "=== 启动家庭服务 ==="
 
 # 确保网络存在
 if ! docker network inspect family-network &>/dev/null; then
-    echo "创建 family-network (${NETWORK_SUBNET})..."
-    docker network create --subnet=${NETWORK_SUBNET} family-network
+    echo "创建 family-network..."
+    docker network create family-network
 fi
 
 # 启动各服务

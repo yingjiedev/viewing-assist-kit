@@ -19,8 +19,7 @@ services:
     volumes:
       - ${DATA_DIR:-/srv/media}/config/jellyseerr:/app/config
     networks:
-      family-network:
-        ipv4_address: ${JELLYSEERR_IP}
+      - family-network
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
       start_period: 20s

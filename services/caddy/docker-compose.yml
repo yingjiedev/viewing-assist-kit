@@ -8,8 +8,7 @@ services:
       - "443:443"
       - "443:443/udp"
     networks:
-      family-network:
-        ipv4_address: ${CADDY_IP}
+      - family-network
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

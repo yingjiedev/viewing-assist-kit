@@ -11,8 +11,7 @@ services:
     volumes:
       - ${DATA_DIR:-/srv/media}/config/prowlarr:/config
     networks:
-      family-network:
-        ipv4_address: ${PROWLARR_IP}
+      - family-network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:9696/ping || exit 1"]
       interval: 30s

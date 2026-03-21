@@ -23,8 +23,7 @@ services:
     devices:
       - /dev/dri:/dev/dri
     networks:
-      family-network:
-        ipv4_address: ${SONARR_IP}
+      - family-network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8989/ping || exit 1"]
       interval: 30s

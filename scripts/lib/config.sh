@@ -13,12 +13,11 @@ TEMPLATE_DIR="$DEPLOY_SCRIPT_DIR/templates"
 generate_env() {
     local host_ip="$1"
     local domain="$2"
-    local network_subnet="$3"
-    local data_dir="$4"
-    local puid="$5"
-    local pgid="$6"
-    local tz="$7"
-    local transmission_password="$8"
+    local data_dir="$3"
+    local puid="$4"
+    local pgid="$5"
+    local tz="$6"
+    local transmission_password="$7"
     local env_file="$DEPLOY_SCRIPT_DIR/../.env"
 
     cat > "$env_file" << EOF
@@ -34,22 +33,6 @@ HOST_IP=${host_ip}
 
 # 内网域名后缀
 DOMAIN=${domain}
-
-# Docker 网络子网
-NETWORK_SUBNET=${network_subnet}
-
-# ========================================
-# 服务 IP (按需分配，保持唯一)
-# ========================================
-
-CADDY_IP=172.30.0.11
-HOMEPAGE_IP=172.30.0.4
-JELLYFIN_IP=172.30.0.5
-RADARR_IP=172.30.0.6
-SONARR_IP=172.30.0.7
-PROWLARR_IP=172.30.0.8
-TRANSMISSION_IP=172.30.0.9
-JELLYSEERR_IP=172.30.0.10
 
 # ========================================
 # 服务账户
@@ -139,7 +122,7 @@ validate_config() {
     fi
 
     # 检查必要的变量
-    local required_vars=("HOST_IP" "DOMAIN" "NETWORK_SUBNET" "DATA_DIR" "TRANSMISSION_PASSWORD")
+    local required_vars=("HOST_IP" "DOMAIN" "DATA_DIR" "TRANSMISSION_PASSWORD")
     local missing=()
 
     for var in "${required_vars[@]}"; do

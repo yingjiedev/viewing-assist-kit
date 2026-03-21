@@ -12,6 +12,8 @@ services:
       - JELLYFIN_StrictSSL=false
       - JELLYFIN_EnableApiAccess=true
       - JELLYFIN_EnableWebSocket=true
+    ports:
+      - "${JELLYFIN_PORT:-8096}:8096"
     volumes:
       - ${DATA_DIR:-/srv/media}/config/jellyfin:/config
       - ${DATA_DIR:-/srv/media}/cache/jellyfin:/cache

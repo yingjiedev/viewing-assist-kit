@@ -52,18 +52,77 @@
 ### 一键部署（推荐）
 
 ```bash
-# 交互式部署
+# 交互式部署（可选择模式）
 ./scripts/deploy.sh
 
-# 快速部署（仅需宿主机 IP）
+# 端口模式部署（默认，无需域名）
 ./scripts/deploy.sh -q 192.168.1.100
 
-# 完整参数部署
-./scripts/deploy.sh -i 192.168.1.100 -d /srv/media -D home.local
+# 域名模式部署（需要配置 DNS）
+./scripts/deploy.sh -q 192.168.1.100 -m domain
 
 # 仅生成配置，不启动服务
 ./scripts/deploy.sh --dry-run
 ```
+
+### 部署模式说明
+
+| 模式 | 说明 | 访问方式 | 需要配置 |
+|------|------|----------|----------|
+| **port** (默认) | 端口映射模式 | `http://IP:端口` | 无 |
+| **domain** | 域名反向代理模式 | `https://域名` | DNS 或 /etc/hosts |
+
+#### 端口模式访问地址
+
+| 服务 | 访问地址 |
+|------|----------|
+| Homepage | `http://192.168.1.100:3000` |
+| Jellyfin | `http://192.168.1.100:8096` |
+| Sonarr | `http://192.168.1.100:8989` |
+| Radarr | `http://192.168.1.100:7878` |
+| Prowlarr | `http://192.168.1.100:9696` |
+| Transmission | `http://192.168.1.100:9091` |
+| Jellyseerr | `http://192.168.1.100:5055` |
+
+#### 域名模式配置
+
+在本地 DNS 或 /etc/hosts 添加：
+```
+192.168.1.100  homepage.home.local jellyfin.home.local sonarr.home.local
+192.168.1.100  radarr.home.local prowlarr.home.local transmission.home.local jellyseerr.home.local
+```
+
+部署脚本会自动：
+- 检查前置条件（Docker、端口、磁盘空间等）
+- 生成配置文件和目录结构
+- 创建 Docker 网络
+- 按依赖顺序启动服务
+- 验证服务状态
+
+### 手动部署
+
+```bash
+# 1. 创建网络
+docker network create family-network
+
+# 2. 配置环境变量
+cp .env.example .env
+# 编辑 .env 填入实际值（特别是 DEPLOY_MODE）
+
+# 3. 启动服务
+./scripts/start-all.sh
+```
+
+### 命令行参数
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `-q, --quick <ip>` | 快速部署 | - |
+| `-m, --mode <mode>` | 部署模式: port 或 domain | `port` |
+| `-d, --data <path>` | 数据根目录 | `/srv/media` |
+| `-D, --domain <domain>` | 域名后缀 | `home.local` |
+| `-u, --user <uid>:<gid>` | 运行用户 | `1000:1000` |
+| `--dry-run` | 仅生成配置 | - |
 
 部署脚本会自动：
 - 检查前置条件（Docker、端口、磁盘空间等）

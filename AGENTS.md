@@ -17,9 +17,15 @@ Viewing Assist Kit - Docker Compose orchestration for home media services on Ras
 
 ```bash
 ./scripts/deploy.sh                    # Interactive deployment
-./scripts/deploy.sh -q 192.168.1.100   # Quick deployment (only need host IP)
+./scripts/deploy.sh -q 192.168.1.100   # Port mode (default)
+./scripts/deploy.sh -q 192.168.1.100 -m domain  # Domain mode
 ./scripts/deploy.sh --dry-run          # Dry run (generate config only)
 ```
+
+### Deployment Modes
+
+- **port** (default): Direct IP:port access, no DNS required
+- **domain**: Caddy reverse proxy with HTTPS, requires DNS/hosts config
 
 ### Service Management
 

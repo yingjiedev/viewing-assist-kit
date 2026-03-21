@@ -19,9 +19,11 @@ DEFAULT_DOMAIN="home.local"
 DEFAULT_PUID=1000
 DEFAULT_PGID=1000
 DEFAULT_TZ="Asia/Shanghai"
+DEFAULT_DEPLOY_MODE="port"  # port 或 domain
 
-# 可用服务列表
-ALL_SERVICES=("jellyfin" "prowlarr" "sonarr" "radarr" "transmission" "jellyseerr" "homepage" "caddy")
+# 可用服务列表（不含 caddy，根据模式决定是否添加）
+ALL_APP_SERVICES=("jellyfin" "prowlarr" "sonarr" "radarr" "transmission" "jellyseerr" "homepage")
+ALL_SERVICES=("${ALL_APP_SERVICES[@]}" "caddy")
 
 # 显示帮助
 show_help() {
@@ -37,13 +39,15 @@ Viewing Assist Kit 一键部署脚本
   -d, --data <path>        数据根目录（默认: /srv/media）
   -D, --domain <domain>    域名后缀（默认: home.local）
   -u, --user <uid>:<gid>   运行用户（默认: 1000:1000）
+  -m, --mode <mode>        部署模式: port（端口映射）或 domain（域名反代）
   --dry-run                仅生成配置，不启动服务
   --skip-check             跳过前置检查
   -h, --help               显示此帮助信息
 
 示例:
   $0                              # 交互式部署
-  $0 -q 192.168.1.100             # 快速部署
+  $0 -q 192.168.1.100             # 快速部署（端口模式）
+  $0 -q 192.168.1.100 -m domain   # 快速部署（域名模式）
   $0 -i 192.168.1.100 -d /data    # 指定 IP 和数据目录
   $0 -c production.conf           # 使用配置文件
   $0 --dry-run                    # 仅生成配置文件
@@ -64,13 +68,29 @@ interactive_config() {
         exit 1
     fi
 
+    # 部署模式
+    echo ""
+    echo "部署模式:"
+    echo "  1) 端口模式 (port)   - 直接通过 IP:端口 访问，无需域名解析"
+    echo "  2) 域名模式 (domain) - 通过 Caddy 反向代理，需要配置 DNS/hosts"
+    read -p "选择模式 [1]: " mode_choice
+    case "${mode_choice:-1}" in
+        1|port) DEPLOY_MODE="port" ;;
+        2|domain) DEPLOY_MODE="domain" ;;
+        *) DEPLOY_MODE="port" ;;
+    esac
+
     # 数据目录
     read -p "数据根目录 [${DEFAULT_DATA_DIR}]: " DATA_DIR
     DATA_DIR="${DATA_DIR:-$DEFAULT_DATA_DIR}"
 
-    # 域名后缀
-    read -p "域名后缀 [${DEFAULT_DOMAIN}]: " DOMAIN
-    DOMAIN="${DOMAIN:-$DEFAULT_DOMAIN}"
+    # 域名后缀（仅域名模式需要）
+    if [ "$DEPLOY_MODE" = "domain" ]; then
+        read -p "域名后缀 [${DEFAULT_DOMAIN}]: " DOMAIN
+        DOMAIN="${DOMAIN:-$DEFAULT_DOMAIN}"
+    else
+        DOMAIN="${DEFAULT_DOMAIN}"
+    fi
 
     # 用户 ID
     read -p "运行用户 UID [${DEFAULT_PUID}]: " PUID
@@ -96,7 +116,7 @@ interactive_config() {
     echo ""
     echo "请选择要部署的服务（输入服务编号，空格分隔）:"
     local i=1
-    for service in "${ALL_SERVICES[@]}"; do
+    for service in "${ALL_APP_SERVICES[@]}"; do
         echo "  $i) $service"
         ((i++))
     done
@@ -104,27 +124,20 @@ interactive_config() {
     read -p "服务编号（默认全部）: " service_input
 
     if [ -z "$service_input" ]; then
-        SELECTED_SERVICES=("${ALL_SERVICES[@]}")
+        SELECTED_SERVICES=("${ALL_APP_SERVICES[@]}")
     else
         SELECTED_SERVICES=()
         for num in $service_input; do
-            if [ "$num" -ge 1 ] && [ "$num" -le ${#ALL_SERVICES[@]} ]; then
-                SELECTED_SERVICES+=("${ALL_SERVICES[$((num-1))]}")
+            if [ "$num" -ge 1 ] && [ "$num" -le ${#ALL_APP_SERVICES[@]} ]; then
+                SELECTED_SERVICES+=("${ALL_APP_SERVICES[$((num-1))]}")
             fi
         done
+    fi
 
-        # 确保 caddy 包含在内
-        local has_caddy=false
-        for s in "${SELECTED_SERVICES[@]}"; do
-            if [ "$s" = "caddy" ]; then
-                has_caddy=true
-                break
-            fi
-        done
-        if [ "$has_caddy" = false ]; then
-            SELECTED_SERVICES+=("caddy")
-            echo "[INFO] 已自动添加 caddy（反向代理）"
-        fi
+    # 域名模式自动添加 caddy
+    if [ "$DEPLOY_MODE" = "domain" ]; then
+        SELECTED_SERVICES+=("caddy")
+        echo "[INFO] 域名模式已自动添加 caddy（反向代理）"
     fi
 }
 
@@ -135,10 +148,16 @@ quick_config() {
     HOST_IP="$ip"
     DATA_DIR="$DEFAULT_DATA_DIR"
     DOMAIN="$DEFAULT_DOMAIN"
+    DEPLOY_MODE="${DEPLOY_MODE:-$DEFAULT_DEPLOY_MODE}"
     PUID="$DEFAULT_PUID"
     PGID="$DEFAULT_PGID"
     TZ="$DEFAULT_TZ"
-    SELECTED_SERVICES=("${ALL_SERVICES[@]}")
+    SELECTED_SERVICES=("${ALL_APP_SERVICES[@]}")
+
+    # 域名模式自动添加 caddy
+    if [ "$DEPLOY_MODE" = "domain" ]; then
+        SELECTED_SERVICES+=("caddy")
+    fi
 
     # 生成随机密码
     TRANSMISSION_PASSWORD=$(openssl rand -base64 12)
@@ -171,6 +190,10 @@ parse_args() {
                 ;;
             -D|--domain)
                 DOMAIN="$2"
+                shift 2
+                ;;
+            -m|--mode)
+                DEPLOY_MODE="$2"
                 shift 2
                 ;;
             -u|--user)
@@ -217,7 +240,11 @@ parse_args() {
                 exit 1
             fi
             source "$CONFIG_FILE"
-            SELECTED_SERVICES=("${ALL_SERVICES[@]}")
+            SELECTED_SERVICES=("${ALL_APP_SERVICES[@]}")
+            # 域名模式自动添加 caddy
+            if [ "${DEPLOY_MODE:-port}" = "domain" ]; then
+                SELECTED_SERVICES+=("caddy")
+            fi
             ;;
     esac
 }
@@ -235,10 +262,11 @@ main() {
     # 设置默认值
     DATA_DIR="${DATA_DIR:-$DEFAULT_DATA_DIR}"
     DOMAIN="${DOMAIN:-$DEFAULT_DOMAIN}"
+    DEPLOY_MODE="${DEPLOY_MODE:-$DEFAULT_DEPLOY_MODE}"
     PUID="${PUID:-$DEFAULT_PUID}"
     PGID="${PGID:-$DEFAULT_PGID}"
     TZ="${TZ:-$DEFAULT_TZ}"
-    SELECTED_SERVICES=("${SELECTED_SERVICES[@]:-${ALL_SERVICES[@]}}")
+    SELECTED_SERVICES=("${SELECTED_SERVICES[@]:-${ALL_APP_SERVICES[@]}}")
 
     # 前置检查
     if [ "$SKIP_CHECK" != true ]; then
@@ -247,7 +275,7 @@ main() {
 
     # 生成配置
     echo "=== 生成配置 ==="
-    generate_env "$HOST_IP" "$DOMAIN" "$DATA_DIR" "$PUID" "$PGID" "$TZ" "$TRANSMISSION_PASSWORD"
+    generate_env "$HOST_IP" "$DOMAIN" "$DEPLOY_MODE" "$DATA_DIR" "$PUID" "$PGID" "$TZ" "$TRANSMISSION_PASSWORD"
     validate_config
     echo ""
 
@@ -282,14 +310,30 @@ main() {
     echo "║            部署完成！                     ║"
     echo "╚══════════════════════════════════════════╝"
     echo ""
-    echo "访问地址:"
-    echo "  - Homepage:    https://homepage.${DOMAIN}"
-    echo "  - Jellyfin:    https://jellyfin.${DOMAIN}"
-    echo "  - Sonarr:      https://sonarr.${DOMAIN}"
-    echo "  - Radarr:      https://radarr.${DOMAIN}"
-    echo "  - Prowlarr:    https://prowlarr.${DOMAIN}"
-    echo "  - Transmission: https://transmission.${DOMAIN}"
-    echo "  - Jellyseerr:  https://jellyseerr.${DOMAIN}"
+
+    if [ "$DEPLOY_MODE" = "port" ]; then
+        echo "访问地址（端口模式）:"
+        echo "  - Homepage:     http://${HOST_IP}:3000"
+        echo "  - Jellyfin:     http://${HOST_IP}:8096"
+        echo "  - Sonarr:       http://${HOST_IP}:8989"
+        echo "  - Radarr:       http://${HOST_IP}:7878"
+        echo "  - Prowlarr:     http://${HOST_IP}:9696"
+        echo "  - Transmission: http://${HOST_IP}:9091"
+        echo "  - Jellyseerr:   http://${HOST_IP}:5055"
+    else
+        echo "访问地址（域名模式）:"
+        echo "  请确保已配置 DNS 或 /etc/hosts:"
+        echo "  ${HOST_IP}  homepage.${DOMAIN} jellyfin.${DOMAIN} sonarr.${DOMAIN}"
+        echo "  ${HOST_IP}  radarr.${DOMAIN} prowlarr.${DOMAIN} transmission.${DOMAIN} jellyseerr.${DOMAIN}"
+        echo ""
+        echo "  - Homepage:    https://homepage.${DOMAIN}"
+        echo "  - Jellyfin:    https://jellyfin.${DOMAIN}"
+        echo "  - Sonarr:      https://sonarr.${DOMAIN}"
+        echo "  - Radarr:      https://radarr.${DOMAIN}"
+        echo "  - Prowlarr:    https://prowlarr.${DOMAIN}"
+        echo "  - Transmission: https://transmission.${DOMAIN}"
+        echo "  - Jellyseerr:  https://jellyseerr.${DOMAIN}"
+    fi
     echo ""
     echo "Transmission 登录:"
     echo "  - 用户名: admin"

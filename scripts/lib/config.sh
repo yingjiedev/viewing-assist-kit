@@ -13,16 +13,25 @@ TEMPLATE_DIR="$DEPLOY_SCRIPT_DIR/templates"
 generate_env() {
     local host_ip="$1"
     local domain="$2"
-    local data_dir="$3"
-    local puid="$4"
-    local pgid="$5"
-    local tz="$6"
-    local transmission_password="$7"
+    local deploy_mode="$3"
+    local data_dir="$4"
+    local puid="$5"
+    local pgid="$6"
+    local tz="$7"
+    local transmission_password="$8"
     local env_file="$DEPLOY_SCRIPT_DIR/../.env"
 
     cat > "$env_file" << EOF
 # Viewing Assist Kit 环境变量配置
 # 自动生成于 $(date)
+
+# ========================================
+# 部署模式
+# ========================================
+
+# port = 端口模式（直接 IP:端口 访问）
+# domain = 域名模式（Caddy 反向代理，需配置 DNS）
+DEPLOY_MODE=${deploy_mode}
 
 # ========================================
 # 网络配置
@@ -31,8 +40,20 @@ generate_env() {
 # 宿主机 IP
 HOST_IP=${host_ip}
 
-# 内网域名后缀
+# 内网域名后缀（域名模式必填）
 DOMAIN=${domain}
+
+# ========================================
+# 服务端口（端口模式使用）
+# ========================================
+
+JELLYFIN_PORT=8096
+SONARR_PORT=8989
+RADARR_PORT=7878
+PROWLARR_PORT=9696
+TRANSMISSION_PORT=9091
+JELLYSEERR_PORT=5055
+HOMEPAGE_PORT=3000
 
 # ========================================
 # 服务账户

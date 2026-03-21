@@ -9,6 +9,8 @@ services:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - HOMEPAGE_ALLOWED_HOSTS=homepage.${DOMAIN}
+    ports:
+      - "${HOMEPAGE_PORT:-3000}:3000"
     volumes:
       - ${DATA_DIR:-/srv/media}/config/homepage/data:/app/data
       - ${DATA_DIR:-/srv/media}/config/homepage/config:/app/config

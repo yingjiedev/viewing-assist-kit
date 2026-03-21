@@ -16,6 +16,8 @@ services:
       - PORT=5055
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
+    ports:
+      - "${JELLYSEERR_PORT:-5055}:5055"
     volumes:
       - ${DATA_DIR:-/srv/media}/config/jellyseerr:/app/config
     networks:

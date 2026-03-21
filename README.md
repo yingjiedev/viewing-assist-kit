@@ -15,6 +15,43 @@
 | Homepage | 服务仪表盘 | 3000 |
 | Caddy | 反向代理（域名模式） | 80, 443 |
 
+## 架构
+
+```mermaid
+graph TB
+    subgraph host["宿主机 (树莓派)"]
+        subgraph network["family-network (bridge)"]
+            Caddy --> Homepage
+            Caddy --> Jellyfin
+            Caddy --> Sonarr
+            Caddy --> Radarr
+            Caddy --> Prowlarr
+            Caddy --> Transmission
+            Caddy --> Jellyseerr
+
+            Prowlarr -->|"索引器同步"| Sonarr
+            Prowlarr -->|"索引器同步"| Radarr
+            Transmission -->|"下载"| Sonarr
+            Transmission -->|"下载"| Radarr
+            Sonarr -->|"电视剧请求"| Jellyseerr
+            Radarr -->|"电影请求"| Jellyseerr
+            Jellyfin -->|"媒体播放"| Jellyseerr
+        end
+    end
+
+    User["用户"] --> Caddy
+
+    style Caddy fill:#4472C4,stroke:#333,color:#fff
+    style Jellyfin fill:#00A4DC,stroke:#333,color:#fff
+    style Sonarr fill:#2D72D2,stroke:#333,color:#fff
+    style Radarr fill:#FEC331,stroke:#333,color:#000
+    style Prowlarr fill:#5465FF,stroke:#333,color:#fff
+    style Transmission fill:#D30011,stroke:#333,color:#fff
+    style Jellyseerr fill:#6366F1,stroke:#333,color:#fff
+    style Homepage fill:#0F172A,stroke:#333,color:#fff
+    style User fill:#9CA3AF,stroke:#333,color:#000
+```
+
 ## 快速开始
 
 ### 一键部署（推荐）
@@ -131,14 +168,16 @@ cd services/<服务名> && docker compose logs -f  # 查看日志
 
 ## 免责声明
 
-本项目仅用于个人学习和技术研究，使用的所有服务（如 Jellyfin、Sonarr、Radarr、Prowlarr、Transmission 等）均为其各自项目的开源版本。
-
-- **禁止商用**：本项目及其配置不得用于任何商业用途
-- **版权内容**：请确保仅下载和使用合法获取的媒体内容，尊重版权法律
-- **责任声明**：因使用本项目产生的任何法律纠纷或损失，本项目不承担任何责任
-- **自行承担风险**：使用者应自行评估并承担使用风险
-
-使用本项目即表示你同意上述条款。
+> ⚠️ **重要提示**
+>
+> 本项目仅用于**个人学习和技术研究**，使用的所有服务（如 Jellyfin、Sonarr、Radarr、Prowlarr、Transmission 等）均为其各自项目的开源版本。
+>
+> - **禁止商用**：本项目及其配置不得用于任何商业用途
+> - **版权合规**：请确保仅下载和使用合法获取的媒体内容，尊重版权法律
+> - **责任豁免**：因使用本项目产生的任何法律纠纷或损失，本项目不承担任何责任
+> - **风险自负**：使用者应自行评估并承担使用风险
+>
+> 使用本项目即表示你同意上述条款。
 
 ## 许可证
 

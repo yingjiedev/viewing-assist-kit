@@ -11,7 +11,6 @@
 | 服务 | 域名 | 容器 IP | 端口 | 功能 |
 |------|------|---------|------|------|
 | Caddy | *.${DOMAIN} | ${CADDY_IP} | 80, 443 | 反向代理，HTTPS 自签名证书 |
-| Mihomo | clash.${DOMAIN} | ${MIHOMO_IP} | 7890, 9090 | 代理服务 |
 | Homepage | homepage.${DOMAIN} | ${HOMEPAGE_IP} | 3000 | 服务仪表盘 |
 | Jellyfin | jellyfin.${DOMAIN} | ${JELLYFIN_IP} | 8096 | 媒体服务器 |
 | Radarr | radarr.${DOMAIN} | ${RADARR_IP} | 7878 | 电影管理 |
@@ -80,7 +79,6 @@ cd services/caddy && docker compose up -d
 viewing-assist-kit/
 ├── services/              # Docker Compose 配置
 │   ├── caddy/             # 反向代理
-│   ├── mihomo/            # 代理服务
 │   ├── jellyfin/          # 媒体服务器
 │   ├── sonarr/            # 电视剧管理
 │   ├── radarr/            # 电影管理
@@ -102,9 +100,9 @@ viewing-assist-kit/
 ${HOST_IP}  lb.${DOMAIN} openclaw.${DOMAIN}
 ${HOST_IP}  jellyfin.${DOMAIN} sonarr.${DOMAIN} radarr.${DOMAIN}
 ${HOST_IP}  prowlarr.${DOMAIN} transmission.${DOMAIN} jellyseerr.${DOMAIN}
-${HOST_IP}  homepage.${DOMAIN} clash.${DOMAIN}
+${HOST_IP}  homepage.${DOMAIN}
 ```
 
 ## 许可证
 
-MIT License
+GNU General Public License v3.0

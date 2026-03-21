@@ -63,8 +63,4 @@ https://homepage.{$DOMAIN} {
 	reverse_proxy homepage:3000
 }
 
-# MetaCubeXD (Mihomo Dashboard)
-https://clash.{$DOMAIN} {
-	tls internal
-	reverse_proxy metacubexd:80
-}
+

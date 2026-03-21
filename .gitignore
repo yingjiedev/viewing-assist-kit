@@ -215,7 +215,7 @@ __marimo__/
 *.env.local
 
 # Config files with sensitive data
-services/mihomo/config/*.yaml
+
 services/transmission/config/
 services/jellyfin/config/
 services/radarr/config/

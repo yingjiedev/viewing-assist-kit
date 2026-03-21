@@ -11,6 +11,7 @@ source "$DEPLOY_SCRIPT_DIR/lib/check.sh"
 source "$DEPLOY_SCRIPT_DIR/lib/config.sh"
 source "$DEPLOY_SCRIPT_DIR/lib/network.sh"
 source "$DEPLOY_SCRIPT_DIR/lib/service.sh"
+source "$DEPLOY_SCRIPT_DIR/lib/setup.sh"
 
 # 默认值
 DEFAULT_HOST_IP=""
@@ -42,6 +43,7 @@ Viewing Assist Kit 一键部署脚本
   -m, --mode <mode>        部署模式: port（端口映射）或 domain（域名反代）
   --dry-run                仅生成配置，不启动服务
   --skip-check             跳过前置检查
+  --skip-setup             跳过服务关联自动配置
   -h, --help               显示此帮助信息
 
 示例:
@@ -209,6 +211,10 @@ parse_args() {
                 SKIP_CHECK=true
                 shift
                 ;;
+            --skip-setup)
+                SKIP_SETUP=true
+                shift
+                ;;
             -h|--help)
                 show_help
                 ;;
@@ -301,6 +307,42 @@ main() {
 
     # 启动服务
     start_services "${SELECTED_SERVICES[@]}"
+
+    # 服务关联自动配置
+    if [ "$SKIP_SETUP" != true ]; then
+        echo "=== 服务关联自动配置 ==="
+        # 检查是否所有必要服务都已选择
+        local has_prowlarr=false
+        local has_sonarr=false
+        local has_radarr=false
+        local has_transmission=false
+        local has_jellyseerr=false
+        local has_jellyfin=false
+
+        for service in "${SELECTED_SERVICES[@]}"; do
+            case "$service" in
+                prowlarr) has_prowlarr=true ;;
+                sonarr) has_sonarr=true ;;
+                radarr) has_radarr=true ;;
+                transmission) has_transmission=true ;;
+                jellyseerr) has_jellyseerr=true ;;
+                jellyfin) has_jellyfin=true ;;
+            esac
+        done
+
+        if [ "$has_prowlarr" = true ] && [ "$has_sonarr" = true ] && \
+           [ "$has_radarr" = true ] && [ "$has_transmission" = true ] && \
+           [ "$has_jellyseerr" = true ] && [ "$has_jellyfin" = true ]; then
+            setup_all_services \
+                "$DATA_DIR" \
+                "$HOST_IP" \
+                "$TRANSMISSION_PASSWORD"
+        else
+            echo "[SKIP] 跳过关联配置（部分服务未选择部署）"
+            echo "  提示: 使用 ./scripts/setup-services.sh 手动配置"
+        fi
+        echo ""
+    fi
 
     # 显示状态
     show_status

@@ -3,17 +3,22 @@ services:
     image: ghcr.nju.edu.cn/linuxserver/radarr:latest
     container_name: radarr
     restart: unless-stopped
+    depends_on:
+      prowlarr:
+        condition: service_healthy
+      transmission:
+        condition: service_healthy
 
     environment:
       - TZ=${TZ:-Asia/Shanghai}
-      - PUID=0
-      - PGID=0
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
       - RADARR_EnableWebSocket=true
       - RADARR_EnableApiAccess=true
     volumes:
-      - ./config:/config
-      - /path/to/movies:/movies
-      - /path/to/downloads:/downloads
+      - ${DATA_DIR:-/srv/media}/config/radarr:/config
+      - ${DATA_DIR:-/srv/media}/media/movies:/movies
+      - ${DATA_DIR:-/srv/media}/downloads:/downloads
     networks:
       family-network:
         ipv4_address: ${RADARR_IP}

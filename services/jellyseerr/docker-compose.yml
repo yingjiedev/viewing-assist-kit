@@ -3,14 +3,21 @@ services:
     image: ghcr.nju.edu.cn/seerr-team/seerr:latest
     container_name: jellyseerr
     restart: unless-stopped
+    depends_on:
+      sonarr:
+        condition: service_healthy
+      radarr:
+        condition: service_healthy
+      jellyfin:
+        condition: service_healthy
 
     environment:
       - TZ=${TZ:-Asia/Shanghai}
       - PORT=5055
-      - PUID=1000
-      - PGID=1000
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
     volumes:
-      - ./config:/app/config
+      - ${DATA_DIR:-/srv/media}/config/jellyseerr:/app/config
     networks:
       family-network:
         ipv4_address: ${JELLYSEERR_IP}

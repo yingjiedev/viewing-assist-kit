@@ -6,16 +6,16 @@ services:
 
     environment:
       - TZ=${TZ:-Asia/Shanghai}
-      - PUID=0
-      - PGID=0
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
       - JELLYFIN_PublishedServerUrl=http://${HOST_IP}
       - JELLYFIN_StrictSSL=false
       - JELLYFIN_EnableApiAccess=true
       - JELLYFIN_EnableWebSocket=true
     volumes:
-      - ./config:/config
-      - ./cache:/cache
-      - /path/to/media:/media
+      - ${DATA_DIR:-/srv/media}/config/jellyfin:/config
+      - ${DATA_DIR:-/srv/media}/cache/jellyfin:/cache
+      - ${DATA_DIR:-/srv/media}/media:/media
       - ./fonts:/usr/share/fonts/truetype
     devices:
       - /dev/dri:/dev/dri

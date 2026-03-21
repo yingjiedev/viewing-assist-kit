@@ -4,18 +4,18 @@ services:
     container_name: transmission
     restart: unless-stopped
     ports:
-      - "51413:51413"        # BT 端口
+      - "51413:51413"
       - "51413:51413/udp"
     environment:
-      - TZ=${TZ:-Etc/UTC}
-      - PUID=0
-      - PGID=0
+      - TZ=${TZ:-Asia/Shanghai}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
       - USERNAME=${TRANSMISSION_USERNAME:-admin}
-      - PASSWORD=${TRANSMISSION_PASSWORD:-password}
+      - PASSWORD=${TRANSMISSION_PASSWORD}
     volumes:
-      - ./config:/config
-      - /path/to/downloads:/downloads
-      - ./watch:/watch
+      - ${DATA_DIR:-/srv/media}/config/transmission:/config
+      - ${DATA_DIR:-/srv/media}/downloads:/downloads
+      - ${DATA_DIR:-/srv/media}/watch:/watch
     networks:
       family-network:
         ipv4_address: ${TRANSMISSION_IP}

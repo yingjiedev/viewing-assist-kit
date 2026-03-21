@@ -13,6 +13,19 @@ Viewing Assist Kit - Docker Compose orchestration for home media services on Ras
 
 ## Commands
 
+### One-Click Deploy (Recommended)
+
+```bash
+# Interactive deployment
+./scripts/deploy.sh
+
+# Quick deployment (only need host IP)
+./scripts/deploy.sh -q 192.168.1.100
+
+# Dry run (generate config only)
+./scripts/deploy.sh --dry-run
+```
+
 ### Service Management
 
 ```bash
@@ -94,6 +107,9 @@ services/          # Each service has its own directory
   <service>/
     docker-compose.yml
 scripts/           # Shell scripts for batch operations
+  deploy.sh        # One-click deployment script
+  lib/             # Utility modules (check, config, network, service)
+  templates/       # Configuration templates
 docs/              # Documentation
 skills/            # OpenClaw skill definitions
 ```

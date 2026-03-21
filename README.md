@@ -41,37 +41,62 @@
 │  │    │Jellyfin │ │ Sonarr  │ │ Radarr  │ │Prowlarr │       │ │
 │  │    └─────────┘ └─────────┘ └─────────┘ └─────────┘       │ │
 │  │                                                           │ │
-│  │    ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐       │ │
-│  │    │Transmis.│ │Jellyseer│ │Homepage │ │ Mihomo  │       │ │
-│  │    └─────────┘ └─────────┘ └─────────┘ └─────────┘       │ │
+│  │    ┌─────────┐ ┌─────────┐ ┌─────────┐                    │ │
+│  │    │Transmis.│ │Jellyseer│ │Homepage │                    │ │
+│  │    └─────────┘ └─────────┘ └─────────┘                    │ │
 │  └───────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ## 快速开始
 
-### 1. 创建网络
+### 一键部署（推荐）
 
 ```bash
-docker network create --subnet=${NETWORK_SUBNET} family-network
+# 交互式部署
+./scripts/deploy.sh
+
+# 快速部署（仅需宿主机 IP）
+./scripts/deploy.sh -q 192.168.1.100
+
+# 完整参数部署
+./scripts/deploy.sh -i 192.168.1.100 -d /srv/media -D home.local
+
+# 仅生成配置，不启动服务
+./scripts/deploy.sh --dry-run
 ```
 
-### 2. 配置环境变量
+部署脚本会自动：
+- 检查前置条件（Docker、端口、磁盘空间等）
+- 生成配置文件和目录结构
+- 创建 Docker 网络
+- 按依赖顺序启动服务
+- 验证服务状态
+
+### 手动部署
 
 ```bash
+# 1. 创建网络
+docker network create --subnet=${NETWORK_SUBNET} family-network
+
+# 2. 配置环境变量
 cp .env.example .env
 # 编辑 .env 填入实际值
-```
 
-### 3. 启动服务
-
-```bash
-# 启动所有服务
+# 3. 启动服务
 ./scripts/start-all.sh
-
-# 或单独启动
-cd services/caddy && docker compose up -d
 ```
+
+### 命令行参数
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `-q, --quick <ip>` | 快速部署 | - |
+| `-d, --data <path>` | 数据根目录 | `/srv/media` |
+| `-n, --network <subnet>` | Docker 子网 | `172.30.0.0/16` |
+| `-D, --domain <domain>` | 域名后缀 | `home.local` |
+| `-u, --user <uid>:<gid>` | 运行用户 | `1000:1000` |
+| `--dry-run` | 仅生成配置 | - |
 
 ## 目录结构
 
@@ -86,10 +111,14 @@ viewing-assist-kit/
 │   ├── transmission/      # BT 下载
 │   ├── jellyseerr/        # 媒体请求
 │   └── homepage/          # 仪表盘
+├── scripts/               # 工具脚本
+│   ├── deploy.sh          # 一键部署脚本
+│   ├── start-all.sh       # 启动所有服务
+│   ├── stop-all.sh        # 停止所有服务
+│   └── lib/               # 工具库
 ├── skills/                # OpenClaw 技能
 │   └── home-container-tools/
-├── docs/                  # 文档
-└── scripts/               # 工具脚本
+└── docs/                  # 文档
 ```
 
 ## 域名配置

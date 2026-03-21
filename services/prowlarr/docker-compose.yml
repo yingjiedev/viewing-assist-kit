@@ -6,10 +6,10 @@ services:
 
     environment:
       - TZ=${TZ:-Asia/Shanghai}
-      - PUID=0
-      - PGID=0
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
     volumes:
-      - ./config:/config
+      - ${DATA_DIR:-/srv/media}/config/prowlarr:/config
     networks:
       family-network:
         ipv4_address: ${PROWLARR_IP}

@@ -6,13 +6,14 @@ services:
 
     environment:
       - TZ=${TZ:-Asia/Shanghai}
-      - PUID=0
-      - PGID=0
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+    ports:
+      - "${PROWLARR_PORT:-9696}:9696"
     volumes:
-      - ./config:/config
+      - ${DATA_DIR:-/srv/media}/config/prowlarr:/config
     networks:
-      family-network:
-        ipv4_address: ${PROWLARR_IP}
+      - family-network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:9696/ping || exit 1"]
       interval: 30s

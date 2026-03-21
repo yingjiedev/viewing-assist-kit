@@ -8,12 +8,17 @@ services:
       - "443:443"
       - "443:443/udp"
     networks:
-      family-network:
-        ipv4_address: ${CADDY_IP}
+      - family-network
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider https://localhost/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 volumes:
   caddy_data:

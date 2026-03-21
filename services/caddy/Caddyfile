@@ -1,24 +1,10 @@
 {
 	auto_https disable_redirects
-	default_sni lb.{$DOMAIN}
 }
 
 # HTTP → HTTPS 跳转
 http:// {
 	redir https://{host}{uri} permanent
-}
-
-# 默认内部站点（用于 SNI-less 客户端）
-https://lb.{$DOMAIN} {
-	tls internal
-	reverse_proxy {$HOST_IP}:{$OPENCLAW_PORT}
-}
-
-# OpenClaw Dashboard
-https://openclaw.{$DOMAIN},
-https://{$HOST_IP} {
-	tls internal
-	reverse_proxy {$HOST_IP}:{$OPENCLAW_PORT}
 }
 
 # Jellyfin

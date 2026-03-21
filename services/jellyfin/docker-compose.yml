@@ -6,22 +6,23 @@ services:
 
     environment:
       - TZ=${TZ:-Asia/Shanghai}
-      - PUID=0
-      - PGID=0
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
       - JELLYFIN_PublishedServerUrl=http://${HOST_IP}
       - JELLYFIN_StrictSSL=false
       - JELLYFIN_EnableApiAccess=true
       - JELLYFIN_EnableWebSocket=true
+    ports:
+      - "${JELLYFIN_PORT:-8096}:8096"
     volumes:
-      - ./config:/config
-      - ./cache:/cache
-      - /path/to/media:/media
+      - ${DATA_DIR:-/srv/media}/config/jellyfin:/config
+      - ${DATA_DIR:-/srv/media}/cache/jellyfin:/cache
+      - ${DATA_DIR:-/srv/media}/media:/media
       - ./fonts:/usr/share/fonts/truetype
     devices:
       - /dev/dri:/dev/dri
     networks:
-      family-network:
-        ipv4_address: ${JELLYFIN_IP}
+      - family-network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8096/health || exit 1"]
       interval: 30s

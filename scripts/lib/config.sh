@@ -77,6 +77,27 @@ PUID=${puid}
 PGID=${pgid}
 
 # ========================================
+# 服务关联配置（可选，有默认值）
+# ========================================
+
+# Sonarr 默认质量配置文件
+# 可选值: SD, HD-720p, HD-1080p, Ultra-HD, Any
+SONARR_QUALITY_PROFILE=HD-1080p
+
+# Radarr 默认质量配置文件
+# 可选值: SD, HD-720p, HD-1080p, Ultra-HD, Any
+RADARR_QUALITY_PROFILE=HD-1080p
+
+# Sonarr 媒体根目录（容器内路径）
+SONARR_ROOT_FOLDER=/tv
+
+# Radarr 媒体根目录（容器内路径）
+RADARR_ROOT_FOLDER=/movies
+
+# Transmission 下载目录（容器内路径）
+TRANSMISSION_DOWNLOAD_DIR=/downloads
+
+# ========================================
 # 其他配置
 # ========================================
 

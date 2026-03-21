@@ -17,7 +17,6 @@ SERVICES=(
     "radarr"
     "sonarr"
     "jellyfin"
-    "mihomo"
 )
 
 echo "=== 停止家庭服务 ==="

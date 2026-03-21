@@ -19,7 +19,6 @@ fi
 
 # 服务启动顺序（依赖优先）
 SERVICES=(
-    "mihomo"
     "jellyfin"
     "sonarr"
     "radarr"

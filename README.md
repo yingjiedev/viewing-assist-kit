@@ -183,10 +183,9 @@ viewing-assist-kit/
 在本地 DNS 或 /etc/hosts 添加：
 
 ```
-${HOST_IP}  lb.${DOMAIN} openclaw.${DOMAIN}
-${HOST_IP}  jellyfin.${DOMAIN} sonarr.${DOMAIN} radarr.${DOMAIN}
-${HOST_IP}  prowlarr.${DOMAIN} transmission.${DOMAIN} jellyseerr.${DOMAIN}
-${HOST_IP}  homepage.${DOMAIN}
+192.168.1.100  jellyfin.home.local sonarr.home.local radarr.home.local
+192.168.1.100  prowlarr.home.local transmission.home.local jellyseerr.home.local
+192.168.1.100  homepage.home.local
 ```
 
 ## 许可证

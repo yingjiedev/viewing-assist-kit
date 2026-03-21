@@ -82,9 +82,6 @@ PGID=${pgid}
 
 # 时区
 TZ=${tz}
-
-# OpenClaw Gateway 端口
-OPENCLAW_PORT=18789
 EOF
 
     echo "[OK] 已生成配置文件: $env_file"
